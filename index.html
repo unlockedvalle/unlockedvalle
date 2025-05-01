@@ -1,60 +1,11 @@
 <script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unlocked VALLE Reloaded - Inicio</title>
-    <link rel="icon" href="https://i.ibb.co/k2xF0B7k/b2ad8y.png" type="image/png">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
+    var gk_isXlsx = false;
+    var gk_xlsxFileLookup = {};
+    var gk_fileData = {};
+    function filledCell(cell) {
+        return cell !== '' && cell != null;
+    }
+    function loadFileData(filename) {
         if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
             try {
                 var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
@@ -65,10 +16,10 @@
                 var filteredData = jsonData.filter(row => row.some(filledCell));
 
                 var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                    row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
                 );
                 if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
+                    headerRowIndex = 0;
                 }
 
                 var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
@@ -80,8 +31,18 @@
             }
         }
         return gk_fileData[filename] || "";
-        }
-    </script>
+    }
+</script>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unlocked VALLE Reloaded - Inicio</title>
+    <link rel="icon" href="https://i.ibb.co/k2xF0B7k/b2ad8y.png" type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -310,7 +271,7 @@
 
         .features-list {
             list-style: none;
-           engage: flex;
+            display: flex;
             flex-direction: column;
             gap: 14px;
             padding: 0;
@@ -479,6 +440,31 @@
             margin-top: 16px;
         }
 
+        .disabled-message {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #0f172a;
+            color: #e2e8f0;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .disabled-message h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #4f46e5, #7e22ce);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .disabled-message p {
+            font-size: 18px;
+            color: #d1d5db;
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -486,7 +472,7 @@
 
             .sidebar.visible {
                 transform: translateX(0);
-           
+            }
 
             .main-content {
                 margin-left: 0;
@@ -540,6 +526,14 @@
             .password-container {
                 padding: 24px;
                 max-width: 90%;
+            }
+
+            .disabled-message h1 {
+                font-size: 28px;
+            }
+
+            .disabled-message p {
+                font-size: 16px;
             }
         }
     </style>
@@ -657,9 +651,23 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            checkSiteDisabled();
             checkAuth();
             initParticles();
         });
+
+        function checkSiteDisabled() {
+            const isDisabled = localStorage.getItem('siteDisabled') === 'true';
+            console.log(`Verificando siteDisabled: ${isDisabled}`);
+            if (isDisabled) {
+                document.body.innerHTML = `
+                    <div class="disabled-message">
+                        <h1>Sitio Deshabilitado</h1>
+                        <p>Unlocked Valle Reloaded está temporalmente deshabilitado. Contacta al administrador para más información.</p>
+                    </div>
+                `;
+            }
+        }
 
         function initParticles() {
             particlesJS('particles-js', {
