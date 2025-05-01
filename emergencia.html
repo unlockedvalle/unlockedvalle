@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergencia - Unlocked Valle Reloaded</title>
+    <link rel="icon" href="https://files.catbox.moe/b2ad8y.png" type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #0f172a;
+            color: #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        #passwordOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        #passwordOverlay.hidden {
+            opacity: 0;
+            display: none;
+            pointer-events: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .password-container {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            transform: scale(0.8);
+            animation: popIn 0.4s ease forwards;
+        }
+
+        @keyframes popIn {
+            to { transform: scale(1); }
+        }
+
+        .password-container h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #e2e8f0;
+        }
+
+        .password-container input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: #e2e8f0;
+            transition: border-color 0.3s ease;
+        }
+
+        .password-container input:focus {
+            border-color: #7e22ce;
+            outline: none;
+        }
+
+        .password-container button {
+            background: linear-gradient(135deg, #4f46e5, #7e22ce);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        .password-container button:hover {
+            background: linear-gradient(135deg, #3b82f6, #6b21a8);
+            transform: translateY(-2px);
+        }
+
+        .password-container p {
+            color: #f87171;
+            font-size: 14px;
+            margin-top: 16px;
+        }
+
+        .main-content {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 32px;
+            max-width: 1280px;
+            width: 100%;
+            transition: opacity 0.3s ease;
+            opacity: 0;
+        }
+
+        .main-content.visible {
+            display: flex;
+            opacity: 1;
+        }
+
+        .emergency-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+            transform: scale(0.8);
+            animation: popIn 0.4s ease forwards;
+        }
+
+        .emergency-card h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #4f46e5, #7e22ce);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .emergency-card p {
+            font-size: 16px;
+            color: #d1d5db;
+            margin-bottom: 24px;
+        }
+
+        .emergency-button {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            max-width: 300px;
+            transition: all 0.3s ease;
+        }
+
+        .emergency-button.enabled {
+            background: linear-gradient(135deg, #16a34a, #15803d);
+        }
+
+        .emergency-button:hover {
+            transform: translateY(-2px);
+        }
+
+        .emergency-button.enabled:hover {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+        }
+
+        @media (max-width: 768px) {
+            .password-container {
+                padding: 24px;
+                max-width: 90%;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .emergency-card {
+                padding: 24px;
+            }
+
+            .emergency-card h2 {
+                font-size: 28px;
+            }
+
+            .emergency-button {
+                padding: 14px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    <div id="passwordOverlay">
+        <div class="password-container">
+            <h2>Ingresar Contraseña</h2>
+            <input type="password" id="passwordInput" placeholder="Contraseña">
+            <button id="submitPassword">Ingresar</button>
+            <p id="errorMessage" style="display: none;">Contraseña incorrecta. Intenta de nuevo.</p>
+        </div>
+    </div>
+
+    <div class="main-content" id="mainContent">
+        <div class="emergency-card">
+            <h2>Control de Emergencia</h2>
+            <p>Utiliza este botón para deshabilitar o habilitar todo el sitio Unlocked Valle Reloaded. Ten cuidado, esta acción afecta a todas las páginas del sitio.</p>
+            <button id="emergencyToggle" class="emergency-button">Deshabilitar Sitio</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            initParticles();
+            const submitButton = document.getElementById('submitPassword');
+            submitButton.addEventListener('click', checkPassword);
+            initEmergencyButton();
+        });
+
+        function initParticles() {
+            particlesJS('particles-js', {
+                particles: {
+                    number: { value: 80, density: { enable: true, value_area: 800 } },
+                    color: { value: '#7e22ce' },
+                    shape: { type: 'circle' },
+                    opacity: { value: 0.5, random: true },
+                    size: { value: 3, random: true },
+                    line_linked: { enable: true, distance: 150, color: '#7e22ce', opacity: 0.4, width: 1 },
+                    move: { enable: true, speed: 2, direction: 'none', random: false, straight: false, out_mode: 'out', bounce: false }
+                },
+                interactivity: {
+                    detect_on: 'canvas',
+                    events: { onhover: { enable: true, mode: 'repulse' }, onclick: { enable: true, mode: 'push' }, resize: true },
+                    modes: { repulse: { distance: 100, duration: 0.4 }, push: { particles_nb: 4 } }
+                },
+                retina_detect: true
+            });
+        }
+
+        function checkAuth() {
+            const isAuthenticated = sessionStorage.getItem('emergencyAuthenticated') === 'true';
+            const passwordOverlay = document.getElementById('passwordOverlay');
+            const mainContent = document.getElementById('mainContent');
+
+            if (isAuthenticated) {
+                passwordOverlay.classList.add('hidden');
+                mainContent.classList.add('visible');
+            } else {
+                passwordOverlay.classList.remove('hidden');
+                mainContent.classList.remove('visible');
+            }
+        }
+
+        function checkPassword() {
+            console.log("checkPassword ejecutado");
+            const passwordInput = document.getElementById('passwordInput').value;
+            const errorMessage = document.getElementById('errorMessage');
+            const passwordOverlay = document.getElementById('passwordOverlay');
+            const mainContent = document.getElementById('mainContent');
+
+            if (passwordInput === 'bichosiu1928@') {
+                console.log("Contraseña correcta");
+                sessionStorage.setItem('emergencyAuthenticated', 'true');
+                passwordOverlay.style.animation = 'fadeOut 0.5s ease forwards';
+                setTimeout(() => {
+                    passwordOverlay.classList.add('hidden');
+                    mainContent.classList.add('visible');
+                }, 500);
+            } else {
+                console.log("Contraseña incorrecta");
+                errorMessage.style.display = 'block';
+                document.getElementById('passwordInput').value = '';
+            }
+        }
+
+        function initEmergencyButton() {
+            const button = document.getElementById('emergencyToggle');
+            updateButtonState();
+
+            button.addEventListener('click', () => {
+                const isDisabled = localStorage.getItem('siteDisabled') === 'true';
+                localStorage.setItem('siteDisabled', !isDisabled);
+                updateButtonState();
+            });
+        }
+
+        function updateButtonState() {
+            const button = document.getElementById('emergencyToggle');
+            const isDisabled = localStorage.getItem('siteDisabled') === 'true';
+            button.textContent = isDisabled ? 'Habilitar Sitio' : 'Deshabilitar Sitio';
+            button.classList.toggle('enabled', !isDisabled);
+        }
+    </script>
+</body>
+</html>
