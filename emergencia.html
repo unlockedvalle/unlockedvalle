@@ -318,6 +318,7 @@
             button.addEventListener('click', () => {
                 const isDisabled = localStorage.getItem('siteDisabled') === 'true';
                 localStorage.setItem('siteDisabled', !isDisabled);
+                console.log(`Sitio ${!isDisabled ? 'deshabilitado' : 'habilitado'}`);
                 updateButtonState();
             });
         }
@@ -327,6 +328,7 @@
             const isDisabled = localStorage.getItem('siteDisabled') === 'true';
             button.textContent = isDisabled ? 'Habilitar Sitio' : 'Deshabilitar Sitio';
             button.classList.toggle('enabled', !isDisabled);
+            console.log(`Estado actual: siteDisabled = ${isDisabled}`);
         }
     </script>
 </body>
