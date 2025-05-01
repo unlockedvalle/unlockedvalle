@@ -1,60 +1,11 @@
 <script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Unlocked VALLE Reloaded - Enlaces</title>
-    <link rel="icon" href="https://files.catbox.moe/b2ad8y.png" type="image/png">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-    <script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
+    var gk_isXlsx = false;
+    var gk_xlsxFileLookup = {};
+    var gk_fileData = {};
+    function filledCell(cell) {
+        return cell !== '' && cell != null;
+    }
+    function loadFileData(filename) {
         if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
             try {
                 var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
@@ -65,10 +16,10 @@
                 var filteredData = jsonData.filter(row => row.some(filledCell));
 
                 var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                    row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
                 );
                 if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
+                    headerRowIndex = 0;
                 }
 
                 var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
@@ -80,8 +31,18 @@
             }
         }
         return gk_fileData[filename] || "";
-        }
-    </script>
+    }
+</script>
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unlocked VALLE Reloaded - Enlaces</title>
+    <link rel="icon" href="https://files.catbox.moe/b2ad8y.png" type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -426,6 +387,60 @@
             margin-top: 16px;
         }
 
+        .disabled-message {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #0f172a;
+            color: #e2e8f0;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .disabled-message-container {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 90%;
+            transform: scale(0.8);
+            animation: popIn 0.4s ease forwards;
+        }
+
+        .disabled-message svg {
+            width: 80px;
+            height: 80px;
+            fill: #7e22ce;
+            margin-bottom: 20px;
+            animation: float 2s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .disabled-message h1 {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #4f46e5, #7e22ce);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .disabled-message p {
+            font-size: 18px;
+            color: #d1d5db;
+            line-height: 1.6;
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -479,6 +494,23 @@
             .password-container {
                 padding: 24px;
                 max-width: 90%;
+            }
+
+            .disabled-message-container {
+                padding: 24px;
+            }
+
+            .disabled-message h1 {
+                font-size: 28px;
+            }
+
+            .disabled-message p {
+                font-size: 16px;
+            }
+
+            .disabled-message svg {
+                width: 60px;
+                height: 60px;
             }
         }
     </style>
@@ -595,9 +627,9 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            checkAuth();
             initParticles();
-            // Añadir manejador de eventos al botón
+            checkSiteDisabled();
+            checkAuth();
             const submitButton = document.getElementById('submitPassword');
             submitButton.addEventListener('click', checkPassword);
         });
@@ -622,6 +654,26 @@
             });
         }
 
+        function checkSiteDisabled() {
+            const isDisabled = localStorage.getItem('siteDisabled') === 'true';
+            console.log(`Verificando siteDisabled: ${isDisabled}`);
+            if (isDisabled) {
+                document.body.innerHTML = `
+                    <div id="particles-js"></div>
+                    <div class="disabled-message">
+                        <div class="disabled-message-container">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C10.34 2 9 3.34 9 5v2H6v8c0 2.21 1.79 4 4 4h4c2.21 0 4-1.79 4-4V7h-3V5c0-1.66-1.34-3-3-3zm0 2c.55 0 1 .45 1 1v2h-2V5c0-.55.45-1 1-1z"/>
+                            </svg>
+                            <h1>Sitio Deshabilitado</h1>
+                            <p>Unlocked Valle Reloaded está temporalmente deshabilitado. Contacta al administrador para más información.</p>
+                        </div>
+                    </div>
+                `;
+                initParticles();
+            }
+        }
+
         function checkAuth() {
             const isAuthenticated = sessionStorage.getItem('isAuthenticated') === 'true';
             const passwordOverlay = document.getElementById('passwordOverlay');
@@ -644,7 +696,7 @@
         }
 
         function checkPassword() {
-            console.log("checkPassword ejecutado"); // Para depuración
+            console.log("checkPassword ejecutado");
             const passwordInput = document.getElementById('passwordInput').value;
             const errorMessage = document.getElementById('errorMessage');
             const passwordOverlay = document.getElementById('passwordOverlay');
@@ -663,7 +715,7 @@
                     sidebar.classList.add('visible');
                     initSidebar();
                     animateCards();
-                }, 500); // Espera a que termine la animación
+                }, 500);
             } else {
                 console.log("Contraseña incorrecta");
                 errorMessage.style.display = 'block';
@@ -715,10 +767,6 @@
             mainContent.classList.toggle('full', isHidden);
             menuToggle.classList.toggle('active', !isHidden);
             localStorage.setItem('sidebarHidden', isHidden);
-
-            if (window.innerWidth <= 768) {
-                sidebar.classList.toggle('visible', !isHidden);
-            }
         }
     </script>
 </body>
