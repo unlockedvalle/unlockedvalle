@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emergencia - Unlocked Valle Reloaded</title>
+    <title>Unlocked VALLE Reloaded - Emergencia</title>
     <link rel="icon" href="https://files.catbox.moe/b2ad8y.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
@@ -18,11 +18,10 @@
         body {
             background-color: #0f172a;
             color: #e2e8f0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
             min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             overflow-x: hidden;
         }
 
@@ -35,134 +34,26 @@
             z-index: -1;
         }
 
-        #passwordOverlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #0f172a, #1e293b);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            opacity: 1;
-            transition: opacity 0.5s ease;
-        }
-
-        #passwordOverlay.hidden {
-            opacity: 0;
-            display: none;
-            pointer-events: none;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes fadeOut {
-            from { opacity: 1; }
-            to { opacity: 0; }
-        }
-
-        .password-container {
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 32px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            text-align: center;
-            max-width: 450px;
-            width: 90%;
-            transform: scale(0.8);
-            animation: popIn 0.4s ease forwards;
-        }
-
-        @keyframes popIn {
-            to { transform: scale(1); }
-        }
-
-        .password-container h2 {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: #e2e8f0;
-        }
-
-        .password-container input {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            font-size: 16px;
-            margin-bottom: 20px;
-            color: #e2e8f0;
-            transition: border-color 0.3s ease;
-        }
-
-        .password-container input:focus {
-            border-color: #7e22ce;
-            outline: none;
-        }
-
-        .password-container button {
-            background: linear-gradient(135deg, #4f46e5, #7e22ce);
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            padding: 14px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.3s ease;
-        }
-
-        .password-container button:hover {
-            background: linear-gradient(135deg, #3b82f6, #6b21a8);
-            transform: translateY(-2px);
-        }
-
-        .password-container p {
-            color: #f87171;
-            font-size: 14px;
-            margin-top: 16px;
-        }
-
-        .main-content {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 32px;
-            max-width: 1280px;
-            width: 100%;
-            transition: opacity 0.3s ease;
-            opacity: 0;
-        }
-
-        .main-content.visible {
-            display: flex;
-            opacity: 1;
-        }
-
-        .emergency-card {
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+        .emergency-container {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42ceria, 0.95));
             backdrop-filter: blur(10px);
             border-radius: 20px;
             padding: 32px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             text-align: center;
             max-width: 600px;
-            width: 100%;
+            width: 90%;
             transform: scale(0.8);
             animation: popIn 0.4s ease forwards;
+            position: relative;
         }
 
-        .emergency-card h2 {
-            font-size: 32px;
+        @keyframes popIn {
+            to { transform: scale(1); }
+        }
+
+        .emergency-container h1 {
+            font-size: 36px;
             font-weight: 700;
             margin-bottom: 20px;
             background: linear-gradient(135deg, #4f46e5, #7e22ce);
@@ -170,89 +61,95 @@
             -webkit-text-fill-color: transparent;
         }
 
-        .emergency-card p {
-            font-size: 16px;
+        .emergency-container p {
+            font-size: 18px;
             color: #d1d5db;
             margin-bottom: 24px;
+            line-height: 1.6;
         }
 
         .emergency-button {
-            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
             color: #fff;
             border: none;
-            border-radius: 10px;
-            padding: 16px;
+            border-radius: 14px;
+            padding: 16px 24px;
             font-size: 18px;
             font-weight: 600;
             cursor: pointer;
-            width: 100%;
-            max-width: 300px;
-            transition: all 0.3s ease;
-        }
-
-        .emergency-button.enabled {
-            background: linear-gradient(135deg, #16a34a, #15803d);
+            transition: transform 0.2s ease, background 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
         .emergency-button:hover {
-            transform: translateY(-2px);
+            background: linear-gradient(135deg, #f87171, #dc2626);
+            transform: scale(1.05);
         }
 
-        .emergency-button.enabled:hover {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
+        .emergency-button svg {
+            width: 24px;
+            height: 24px;
+            fill: #fff;
+        }
+
+        .status-message {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #34d399;
+            display: none;
+        }
+
+        .status-message.error {
+            color: #f87171;
         }
 
         @media (max-width: 768px) {
-            .password-container {
-                padding: 24px;
-                max-width: 90%;
-            }
-
-            .main-content {
-                padding: 20px;
-            }
-
-            .emergency-card {
+            .emergency-container {
                 padding: 24px;
             }
 
-            .emergency-card h2 {
+            .emergency-container h1 {
                 font-size: 28px;
             }
 
-            .emergency-button {
-                padding: 14px;
+            .emergency-container p {
                 font-size: 16px;
+            }
+
+            .emergency-button {
+                padding: 14px 20px;
+                font-size: 16px;
+            }
+
+            .emergency-button svg {
+                width: 20px;
+                height: 20px;
             }
         }
     </style>
 </head>
 <body>
     <div id="particles-js"></div>
-    <div id="passwordOverlay">
-        <div class="password-container">
-            <h2>Ingresar Contraseña</h2>
-            <input type="password" id="passwordInput" placeholder="Contraseña">
-            <button id="submitPassword">Ingresar</button>
-            <p id="errorMessage" style="display: none;">Contraseña incorrecta. Intenta de nuevo.</p>
-        </div>
-    </div>
-
-    <div class="main-content" id="mainContent">
-        <div class="emergency-card">
-            <h2>Control de Emergencia</h2>
-            <p>Utiliza este botón para deshabilitar o habilitar todo el sitio Unlocked Valle Reloaded. Ten cuidado, esta acción afecta a todas las páginas del sitio.</p>
-            <button id="emergencyToggle" class="emergency-button">Deshabilitar Sitio</button>
-        </div>
+    <div class="emergency-container">
+        <h1>Control de Emergencia</h1>
+        <p>Este es el botón de emergencia de Unlocked VALLE Reloaded. Úsalo para activar o desactivar el sitio para todos los usuarios. ¡Ten cuidado, esta acción afecta a toda la plataforma!</p>
+        <button class="emergency-button" id="emergencyButton">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 1C5.93 1 1 5.93 1 12s4.93 11 11 11 11-4.93 11-11S18.07 1 12 1zm0 2c4.41 0 8 3.59 8 8s-3.59 8-8 8-8-3.59-8-8 3.59-8 8-8zm-1 4v6h2V7h-2zm0 8v2h2v-2h-2z"/>
+            </svg>
+            Activar/Desactivar Sitio
+        </button>
+        <p class="status-message" id="statusMessage"></p>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            checkAuth();
             initParticles();
-            const submitButton = document.getElementById('submitPassword');
-            submitButton.addEventListener('click', checkPassword);
-            initEmergencyButton();
+            checkSiteStatus();
+            document.getElementById('emergencyButton').addEventListener('click', toggleSiteStatus);
         });
 
         function initParticles() {
@@ -275,60 +172,59 @@
             });
         }
 
-        function checkAuth() {
-            const isAuthenticated = sessionStorage.getItem('emergencyAuthenticated') === 'true';
-            const passwordOverlay = document.getElementById('passwordOverlay');
-            const mainContent = document.getElementById('mainContent');
-
-            if (isAuthenticated) {
-                passwordOverlay.classList.add('hidden');
-                mainContent.classList.add('visible');
-            } else {
-                passwordOverlay.classList.remove('hidden');
-                mainContent.classList.remove('visible');
+        async function checkSiteStatus() {
+            try {
+                const response = await fetch('/config.js');
+                const config = await response.text();
+                const siteConfig = eval(config.replace('var siteConfig =', '')); // Nota: eval es inseguro; en producción, usa JSON
+                const statusMessage = document.getElementById('statusMessage');
+                statusMessage.textContent = siteConfig.siteDisabled ? 'El sitio está DESHABILITADO' : 'El sitio está HABILITADO';
+                statusMessage.style.display = 'block';
+            } catch (error) {
+                console.error('Error al verificar el estado del sitio:', error);
+                showStatusMessage('Error al verificar el estado del sitio', true);
             }
         }
 
-        function checkPassword() {
-            console.log("checkPassword ejecutado");
-            const passwordInput = document.getElementById('passwordInput').value;
-            const errorMessage = document.getElementById('errorMessage');
-            const passwordOverlay = document.getElementById('passwordOverlay');
-            const mainContent = document.getElementById('mainContent');
+        async function toggleSiteStatus() {
+            const statusMessage = document.getElementById('statusMessage');
+            try {
+                // Obtener el estado actual
+                const response = await fetch('/config.js');
+                const config = await response.text();
+                const siteConfig = eval(config.replace('var siteConfig =', '')); // Nota: eval es inseguro
+                const newStatus = !siteConfig.siteDisabled;
 
-            if (passwordInput === 'bichosiu1928@') {
-                console.log("Contraseña correcta");
-                sessionStorage.setItem('emergencyAuthenticated', 'true');
-                passwordOverlay.style.animation = 'fadeOut 0.5s ease forwards';
-                setTimeout(() => {
-                    passwordOverlay.classList.add('hidden');
-                    mainContent.classList.add('visible');
-                }, 500);
-            } else {
-                console.log("Contraseña incorrecta");
-                errorMessage.style.display = 'block';
-                document.getElementById('passwordInput').value = '';
+                // Simular envío a un servicio externo para actualizar config.js
+                // En un escenario real, esto sería una solicitud POST a una API o formulario
+                const updateResponse = await fetch('https://example.com/update-config', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ siteDisabled: newStatus })
+                });
+
+                if (updateResponse.ok) {
+                    showStatusMessage(`Sitio ${newStatus ? 'DESHABILITADO' : 'HABILITADO'} exitosamente`, false);
+                    // Actualizar el mensaje de estado
+                    statusMessage.textContent = newStatus ? 'El sitio está DESHABILITADO' : 'El sitio está HABILITADO';
+                    statusMessage.style.display = 'block';
+                } else {
+                    throw new Error('Error al actualizar el estado');
+                }
+            } catch (error) {
+                console.error('Error al actualizar el estado del sitio:', error);
+                showStatusMessage('Error al actualizar el estado del sitio', true);
             }
         }
 
-        function initEmergencyButton() {
-            const button = document.getElementById('emergencyToggle');
-            updateButtonState();
-
-            button.addEventListener('click', () => {
-                const isDisabled = localStorage.getItem('siteDisabled') === 'true';
-                localStorage.setItem('siteDisabled', !isDisabled);
-                console.log(`Sitio ${!isDisabled ? 'deshabilitado' : 'habilitado'}`);
-                updateButtonState();
-            });
-        }
-
-        function updateButtonState() {
-            const button = document.getElementById('emergencyToggle');
-            const isDisabled = localStorage.getItem('siteDisabled') === 'true';
-            button.textContent = isDisabled ? 'Habilitar Sitio' : 'Deshabilitar Sitio';
-            button.classList.toggle('enabled', !isDisabled);
-            console.log(`Estado actual: siteDisabled = ${isDisabled}`);
+        function showStatusMessage(message, isError = false) {
+            const statusMessage = document.getElementById('statusMessage');
+            statusMessage.textContent = message;
+            statusMessage.classList.toggle('error', isError);
+            statusMessage.style.display = 'block';
+            setTimeout(() => {
+                statusMessage.style.display = 'none';
+            }, 5000);
         }
     </script>
 </body>
