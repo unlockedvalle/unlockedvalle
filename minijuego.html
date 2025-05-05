@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3 en Raya Moderno</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        .pulse {
+            animation: pulse 0.3s ease-in-out;
+        }
+        .toast {
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .toast-hidden {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        .toast-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .cell.disabled {
+            pointer-events: none;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-100 to-purple-200 min-h-screen flex items-center justify-center p-4">
+    <div id="auth-screen" class="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full">
+        <h1 class="text-3xl font-bold text-center text-indigo-600 mb-6">3 en Raya</h1>
+        <div id="login-form">
+            <input id="username" type="text" placeholder="Usuario" class="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <input id="password" type="password" placeholder="Contraseña" class="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <button onclick="login()" class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-3 rounded-lg hover:from-indigo-600 hover:to-purple-700 transition">Iniciar Sesión</button>
+            <p class="text-center mt-4">¿No tienes cuenta? <a href="#" onclick="showRegister()" class="text-indigo-600 hover:underline">Regístrate</a></p>
+        </div>
+        <div id="register-form" class="hidden">
+            <input id="reg-username" type="text" placeholder="Usuario" class="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <input id="reg-password" type="password" placeholder="Contraseña" class="w-full p-3 mb-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <button onclick="register()" class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-3 rounded-lg hover:from-indigo-600 hover:to-purple-700 transition">Registrarse</button>
+            <p class="text-center mt-4">¿Ya tienes cuenta? <a href="#" onclick="showLogin()" class="text-indigo-600 hover:underline">Inicia sesión</a></p>
+        </div>
+    </div>
+
+    <div id="game-screen" class="hidden bg-white rounded-2xl shadow-2xl p-8 max-w-lg w-full">
+        <h1 class="text-3xl font-bold text-center text-indigo-600 mb-6">3 en Raya</h1>
+        <div id="invitations" class="mb-6 hidden">
+            <h2 class="text-xl font-semibold text-gray-700 mb-2">Invitaciones Pendientes</h2>
+            <div id="invitation-list"></div>
+        </div>
+        <div id="mode-selection" class="mb-6 flex flex-col items-center">
+            <div class="flex mb-4">
+                <button onclick="showDifficultySelection()" class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-2 rounded-lg mr-2 hover:from-indigo-600 hover:to-purple-700 transition">Jugar contra IA</button>
+                <button onclick="showInviteForm()" class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-indigo-600 hover:to-purple-700 transition">Jugar contra Jugador</button>
+            </div>
+            <div id="difficulty-selection" class="hidden">
+                <label for="difficulty" class="text-gray-700 mr-2">Dificultad:</label>
+                <select id="difficulty" class="p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <option value="easy">Fácil</option>
+                    <option value="medium">Medio</option>
+                    <option value="hard">Difícil</option>
+                </select>
+                <button onclick="startGame('ai')" class="ml-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-indigo-600 hover:to-purple-700 transition">Iniciar</button>
+            </div>
+            <div id="invite-form" class="hidden">
+                <input id="opponent-username" type="text" placeholder="Nombre del oponente" class="p-2 border rounded-lg mr-2">
+                <button id="send-invite-btn" onclick="sendInvitation()" class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-4 py-2 rounded-lg hover:from-indigo-600 hover:to-purple-700 transition">Enviar Invitación</button>
+                <div id="invite-status" class="mt-2 text-gray-700 hidden"></div>
+            </div>
+        </div>
+        <div id="status" class="text-xl text-center mb-6 text-gray-700"></div>
+        <div id="board" class="grid grid-cols-3 gap-2 w-72 mx-auto">
+            <div class="cell bg-gray-100 rounded-lg flex items-center justify-center h-24 cursor-pointer hover:bg-gray-200 transition" onclick="makeMove(0)"></div>
+            <div class="cell bg-gray-100 rounded-lg flex items-center justify-center h-24 cursor-pointer hover:bg-gray-200 transition" onclick="makeMove(1)"></div>
+            <div class="cell bg-gray-100 rounded-lg flex items-center justify-center h-24 cursor-pointer hover:bg-gray-200 transition" onclick="makeMove(2)"></div>
+            <div class="cell bg-gray-100 rounded-lg flex items-center justify-center h-24 cursor-pointer hover:bg-gray-200 transition" onclick="makeMove(3)"></div>
+            <div class="cell bg-gray-100 rounded-lg flex items-center justify-center h-24 cursor-pointer hover:bg-gray-200 transition" onclick="makeMove(4)"></div>
+            <div class="cell bg-gray-100 rounded-lg flex items-center justify-center h-24 cursor-pointer hover:bg-gray-200 transition" onclick="makeMove(5)"></div>
+            <div class="cell bg-gray-100 rounded-lg flex items-center justify-center h-24 cursor-pointer hover:bg-gray-200 transition" onclick="makeMove(6)"></div>
+            <div class="cell bg-gray-100 rounded-lg flex items-center justify-center h-24 cursor-pointer hover:bg-gray-200 transition" onclick="makeMove(7)"></div>
+            <div class="cell bg-gray-100 rounded-lg flex items-center justify-center h-24 cursor-pointer hover:bg-gray-200 transition" onclick="makeMove(8)"></div>
+        </div>
+        <button onclick="resetGame()" class="mt-6 w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-3 rounded-lg hover:from-indigo-600 hover:to-purple-700 transition">Reiniciar Juego</button>
+        <button id="change-mode" onclick="changeMode()" class="mt-2 w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-3 rounded-lg hover:from-indigo-600 hover:to-purple-700 transition hidden">Cambiar Modo</button>
+        <button onclick="logout()" class="mt-2 w-full bg-gradient-to-r from-red-500 to-red-600 text-white p-3 rounded-lg hover:from-red-600 hover:to-red-700 transition">Cerrar Sesión</button>
+    </div>
+
+    <div id="toast" class="fixed top-4 right-4 bg-gray-800 text-white p-4 rounded-lg shadow-lg toast-hidden"></div>
+
+    <script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+    </script>
+
+    <script>
+        let currentPlayer = 'X';
+        let gameBoard = ['', '', '', '', '', '', '', '', ''];
+        let gameActive = false;
+        let gameMode = '';
+        let playerId = '';
+        let token = '';
+        let aiDifficulty = 'hard';
+        let gameId = '';
+        let pendingInvitationId = null;
+        let playerSymbol = null;
+        let opponentUsername = null;
+        let isMakingMove = false;
+        const API_URL = 'https://backend-3nraya-production.up.railway.app/api';
+        let lastToastTime = 0;
+        const TOAST_DEBOUNCE = 5000;
+
+        // Validate board locally
+        function validateBoard(board) {
+            return Array.isArray(board) && board.length === 9 && board.every(cell => cell === '' || cell === 'X' || cell === 'O');
+        }
+
+        // Toggle board interactivity
+        function toggleBoardInteractivity(enable) {
+            const cells = document.getElementsByClassName('cell');
+            for (let cell of cells) {
+                cell.classList.toggle('disabled', !enable);
+            }
+        }
+
+        // Authentication
+        function showRegister() {
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('register-form').classList.remove('hidden');
+        }
+
+        function showLogin() {
+            document.getElementById('register-form').classList.add('hidden');
+            document.getElementById('login-form').classList.remove('hidden');
+        }
+
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            try {
+                const response = await fetch(`${API_URL}/users/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || 'Error al iniciar sesión');
+                token = data.token;
+                playerId = username;
+                localStorage.setItem('token', token);
+                showToast('Inicio de sesión exitoso');
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('game-screen').classList.remove('hidden');
+                document.getElementById('status').innerText = 'Elige un modo de juego';
+                pollInvitations();
+            } catch (error) {
+                console.error('Login error:', error.message);
+                showToast(`Error: ${error.message}`);
+            }
+        }
+
+        async function register() {
+            const username = document.getElementById('reg-username').value;
+            const password = document.getElementById('reg-password').value;
+            try {
+                const response = await fetch(`${API_URL}/users/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || 'Error al registrarse');
+                showToast('Registro exitoso. Por favor, inicia sesión.');
+                showLogin();
+            } catch (error) {
+                console.error('Register error:', error.message);
+                showToast(`Error: ${error.message}`);
+            }
+        }
+
+        function logout() {
+            token = '';
+            playerId = '';
+            gameId = '';
+            pendingInvitationId = null;
+            playerSymbol = null;
+            opponentUsername = null;
+            localStorage.removeItem('token');
+            gameActive = false;
+            document.getElementById('game-screen').classList.add('hidden');
+            document.getElementById('auth-screen').classList.remove('hidden');
+            resetGame();
+            showToast('Sesión cerrada');
+        }
+
+        // Invitation System
+        function showInviteForm() {
+            console.log('Showing invite form');
+            document.getElementById('mode-selection').classList.remove('hidden');
+            document.getElementById('invite-form').classList.remove('hidden');
+            document.getElementById('difficulty-selection').classList.add('hidden');
+            document.getElementById('invite-status').classList.add('hidden');
+            document.getElementById('send-invite-btn').disabled = false;
+            document.getElementById('opponent-username').value = '';
+        }
+
+        async function sendInvitation() {
+            const opponentUsernameInput = document.getElementById('opponent-username').value;
+            if (!opponentUsernameInput) {
+                showToast('Por favor, ingresa el nombre del oponente');
+                return;
+            }
+            try {
+                console.log(`Sending invitation to ${opponentUsernameInput}`);
+                const response = await fetch(`${API_URL}/invitations`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ from: playerId, to: opponentUsernameInput })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || 'Error al enviar la invitación');
+                pendingInvitationId = data.invitationId;
+                opponentUsername = opponentUsernameInput;
+                document.getElementById('invite-status').innerText = `Esperando respuesta de ${opponentUsername}...`;
+                document.getElementById('invite-status').classList.remove('hidden');
+                document.getElementById('send-invite-btn').disabled = true;
+                showToast(`Invitación enviada a ${opponentUsername}`);
+                pollSentInvitations();
+            } catch (error) {
+                console.error('Send invitation error:', error.message);
+                showToast(`Error: ${error.message}`);
+            }
+        }
+
+        async function pollInvitations() {
+            if (!token) return;
+            try {
+                console.log('Polling invitations for', playerId);
+                const response = await fetch(`${API_URL}/invitations`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message || 'Error al obtener invitaciones');
+                const invitationList = document.getElementById('invitation-list');
+                if (data.invitations && data.invitations.length > 0) {
+                    document.getElementById('invitations').classList.remove('hidden');
+                    invitationList.innerHTML = data.invitations.map(inv => `
+                        <div class="flex items-center justify-between p-2 border-b">
+                            <span>Invitación de ${inv.from_username}</span>
+                            <div>
+                                <button onclick="acceptInvitation(${inv.id}, '${inv.from_username}')" class="bg-gradient-to-r from-green-500 to-green-600 text-white px-3 py-1 rounded-lg mr-2 hover:from-green-600 hover:to-green-700 transition">Aceptar</button>
+                                <button onclick="rejectInvitation(${inv.id})" class="bg-gradient-to-r from-red-500 to-red-600 text-white px-3 py-1 rounded-lg hover:from-red-600 hover:to-red-700 transition">Rechazar</button>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    document.getElementById('invitations').classList.add('hidden');
+                }
+            } catch (error) {
+                console.error('Poll invitations error:', error.message);
+                if (error.message.includes('Token inválido')) {
+                    logout();
+                    showToast('Sesión expirada. Por favor, inicia sesión nuevamente.');
+                    return;
+                }
+                showToast(`Error al obtener invitaciones: ${error.message}`, true);
+            }
+            setTimeout(pollInvitations, 5000);
+        }
+
+        async function pollSentInvitations() {
+            if (!token || !pendingInvitationId) return;
+            try {
+                console.log('Polling sent invitations for', playerId, 'invitationId:', pendingInvitationId);
+                const response = await fetch(`${API_URL}/sent-invitations`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const text = await response.text();
+                console.log('Sent invitations raw response:', text);
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (error) {
+                    throw new Error('Respuesta JSON inválida del servidor');
+                }
+                if (!response.ok) throw new Error(data.message || 'Error al obtener invitaciones enviadas');
+                if (!data.invitations || !Array.isArray(data.invitations)) {
+                    console.warn('Invalid invitations response:', data);
+                    throw new Error('Respuesta inválida del servidor');
+                }
+                const invitation = data.invitations.find(inv => inv.id === pendingInvitationId);
+                if (invitation) {
+                    console.log('Found invitation:', invitation);
+                    if (invitation.status === 'accepted' && invitation.game_id) {
+                        console.log(`Invitation ${pendingInvitationId} accepted, starting game ${invitation.game_id}`);
+                        gameId = invitation.game_id;
+                        pendingInvitationId = null;
+                        playerSymbol = 'X';
+                        document.getElementById('invite-form').classList.add('hidden');
+                        document.getElementById('mode-selection').classList.add('hidden');
+                        showToast('¡Invitación aceptada! Iniciando juego...');
+                        gameMode = 'multiplayer';
+                        gameActive = true;
+                        await syncGameState();
+                        renderBoard();
+                        updateStatus();
+                        pollGameState();
+                    } else if (invitation.status === 'rejected') {
+                        console.log(`Invitation ${pendingInvitationId} rejected`);
+                        pendingInvitationId = null;
+                        document.getElementById('invite-status').innerText = `Invitación a ${invitation.to_username || 'oponente'} rechazada.`;
+                        document.getElementById('invite-status').classList.remove('hidden');
+                        document.getElementById('send-invite-btn').disabled = false;
+                        document.getElementById('opponent-username').value = '';
+                        opponentUsername = null;
+                        showToast('La invitación fue rechazada.');
+                    }
+                } else {
+                    console.warn('Pending invitation not found:', pendingInvitationId);
+                    pendingInvitationId = null;
+                    document.getElementById('invite-status').innerText = 'Invitación no encontrada. Intenta de nuevo.';
+                    document.getElementById('invite-status').classList.remove('hidden');
+                    document.getElementById('send-invite-btn').disabled = false;
+                    document.getElementById('opponent-username').value = '';
+                    opponentUsername = null;
+                    showToast('Error: Invitación no encontrada.');
+                }
+            } catch (error) {
+                console.error('Poll sent invitations error:', error.message, error.stack);
+                if (error.message.includes('Token inválido')) {
+                    logout();
+                    showToast('Sesión expirada. Por favor, inicia sesión nuevamente.');
+                    return;
+                }
+                pendingInvitationId = null;
+                document.getElementById('invite-status').innerText = 'Error al verificar la invitación. Intenta de nuevo.';
+                document.getElementById('invite-status').classList.remove('hidden');
+                document.getElementById('send-invite-btn').disabled = false;
+                document.getElementById('opponent-username').value = '';
+                opponentUsername = null;
+                showToast(`Error al verificar invitaciones enviadas: ${error.message}`);
+            }
+            if (pendingInvitationId) setTimeout(pollSentInvitations, 2000);
+        }
+
+        async function acceptInvitation(invitationId, fromUsername) {
+            try {
+                console.log(`Accepting invitation ${invitationId} from ${fromUsername}`);
+                const response = await fetch(`${API_URL}/invitations/${invitationId}/accept`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ player: playerId })
+                });
+                const data = await response.json();
+                console.log('Accept invitation response:', data);
+                if (!response.ok) throw new Error(data.message || 'Error al aceptar la invitación');
+                gameId = data.gameId;
+                playerSymbol = 'O';
+                opponentUsername = fromUsername;
+                showToast('Invitación aceptada. Iniciando juego...');
+                startGame('multiplayer');
+            } catch (error) {
+                console.error('Accept invitation error:', error.message, error.stack);
+                showToast(`Error: ${error.message}`);
+            }
+        }
+
+        async function rejectInvitation(invitationId) {
+            try {
+                console.log(`Rejecting invitation ${invitationId}`);
+                const response = await fetch(`${API_URL}/invitations/${invitationId}/reject`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+                console.log('Reject invitation response:', data);
+                if (!response.ok) throw new Error(data.message || 'Error al rechazar la invitación');
+                showToast('Invitación rechazada');
+                pollInvitations();
+            } catch (error) {
+                console.error('Reject invitation error:', error.message, error.stack);
+                showToast(`Error: ${error.message}`);
+            }
+        }
+
+        // Game Logic
+        function showDifficultySelection() {
+            console.log('Showing difficulty selection');
+            document.getElementById('mode-selection').classList.remove('hidden');
+            document.getElementById('difficulty-selection').classList.remove('hidden');
+            document.getElementById('invite-form').classList.add('hidden');
+        }
+
+        async function startGame(mode) {
+            console.log(`Starting game in ${mode} mode`);
+            gameMode = mode;
+            gameActive = true;
+            document.getElementById('mode-selection').classList.add('hidden');
+            document.getElementById('change-mode').classList.add('hidden');
+            if (mode === 'ai') {
+                aiDifficulty = document.getElementById('difficulty').value;
+                playerSymbol = 'X';
+                console.log(`AI difficulty set to: ${aiDifficulty}`);
+                document.getElementById('status').innerText = `Tu turno (X) - Dificultad: ${aiDifficulty === 'easy' ? 'Fácil' : aiDifficulty === 'medium' ? 'Medio' : 'Difícil'}`;
+                resetGame();
+            } else {
+                await syncGameState();
+                renderBoard();
+                updateStatus();
+                pollGameState();
+            }
+        }
+
+        async function syncGameState() {
+            try {
+                const response = await fetch(`${API_URL}/games/${gameId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const text = await response.text();
+                console.log('Sync raw response:', text);
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (error) {
+                    throw new Error('Respuesta JSON inválida del servidor');
+                }
+                if (!response.ok) throw new Error(data.message || 'Error al sincronizar el estado del juego');
+                if (!validateBoard(data.board)) {
+                    console.warn('Invalid board received:', data.board);
+                    data.board = ['', '', '', '', '', '', '', '', ''];
+                }
+                gameBoard = data.board;
+                currentPlayer = data.currentPlayer;
+                if (!playerSymbol) {
+                    playerSymbol = data.player1 === playerId ? 'X' : 'O';
+                }
+                opponentUsername = opponentUsername || (playerSymbol === 'X' ? data.player2 : data.player1);
+                console.log('Game state synced:', { gameId, playerSymbol, currentPlayer, board: gameBoard });
+                renderBoard();
+                updateStatus();
+            } catch (error) {
+                console.error('Sync game state error:', error.message);
+                showToast(`Error al sincronizar el juego: ${error.message}`);
+            }
+        }
+
+        function updateStatus() {
+            if (!opponentUsername) {
+                document.getElementById('status').innerText = `Esperando oponente...`;
+                return;
+            }
+            if (playerSymbol === currentPlayer) {
+                document.getElementById('status').innerText = `Tu turno (${playerSymbol})`;
+            } else {
+                document.getElementById('status').innerText = `Turno de ${opponentUsername} (${playerSymbol === 'X' ? 'O' : 'X'})`;
+            }
+        }
+
+        async function makeMove(index) {
+            if (!gameActive || gameBoard[index] !== '' || gameMode !== 'multiplayer' || playerSymbol !== currentPlayer || isMakingMove) {
+                console.log(`Move blocked:`, { gameActive, cell: gameBoard[index], gameMode, playerSymbol, currentPlayer, isMakingMove });
+                return;
+            }
+
+            isMakingMove = true;
+            toggleBoardInteractivity(false);
+            console.log(`Player ${playerSymbol} attempts move at index ${index}`);
+
+            // Store optimistic move
+            const originalBoard = [...gameBoard];
+            gameBoard[index] = playerSymbol;
+            renderBoard();
+
+            try {
+                await updateGameState();
+                await syncGameState(); // Sync to confirm backend state
+                if (checkWin()) {
+                    console.log(`${playerSymbol} wins`);
+                    document.getElementById('status').innerText = `¡${playerId} gana!`;
+                    gameActive = false;
+                    document.getElementById('change-mode').classList.remove('hidden');
+                    showToast(`¡${playerId} ha ganado!`);
+                    return;
+                }
+                if (checkDraw()) {
+                    console.log('Game is a draw');
+                    document.getElementById('status').innerText = '¡Empate!';
+                    gameActive = false;
+                    document.getElementById('change-mode').classList.remove('hidden');
+                    showToast('Juego empatado');
+                    return;
+                }
+            } catch (error) {
+                console.error('Move failed, reverting:', error.message);
+                gameBoard = originalBoard; // Revert optimistic update
+                await syncGameState();
+                renderBoard();
+                updateStatus();
+            } finally {
+                isMakingMove = false;
+                toggleBoardInteractivity(true);
+            }
+        }
+
+        async function updateGameState() {
+            if (!validateBoard(gameBoard)) {
+                console.error('Invalid board before update:', gameBoard);
+                showToast('Error: Tablero inválido');
+                throw new Error('Tablero inválido');
+            }
+            try {
+                console.log('Sending move:', { gameId, player: playerId, board: gameBoard, currentPlayer: playerSymbol });
+                const response = await fetch(`${API_URL}/games/${gameId}/move`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ player: playerId, board: gameBoard, currentPlayer: playerSymbol })
+                });
+                const text = await response.text();
+                console.log('Update game state raw response:', text);
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (error) {
+                    throw new Error('Respuesta JSON inválida del servidor');
+                }
+                if (!response.ok) {
+                    console.error('Move failed:', { message: data.message, status: response.status });
+                    showToast(`Error: ${data.message || 'No se pudo registrar el movimiento'}`);
+                    throw new Error(data.message || 'Error al enviar el movimiento');
+                }
+                console.log('Move successful:', { gameId, playerId, board: gameBoard });
+            } catch (error) {
+                console.error('Update game state error:', error.message);
+                throw error;
+            }
+        }
+
+        async function pollGameState() {
+            if (!gameActive || gameMode !== 'multiplayer' || isMakingMove) {
+                setTimeout(pollGameState, 2000);
+                return;
+            }
+            try {
+                const response = await fetch(`${API_URL}/games/${gameId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const text = await response.text();
+                console.log('Poll raw response:', text);
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (error) {
+                    throw new Error('Respuesta JSON inválida del servidor');
+                }
+                if (!response.ok) throw new Error(data.message || 'Error al obtener el estado del juego');
+                if (!validateBoard(data.board)) {
+                    console.warn('Invalid board received:', data.board);
+                    data.board = ['', '', '', '', '', '', '', '', ''];
+                }
+                gameBoard = data.board;
+                currentPlayer = data.currentPlayer;
+                renderBoard();
+                updateStatus();
+                if (data.status === 'won') {
+                    const winnerName = data.winner === playerSymbol ? playerId : opponentUsername;
+                    document.getElementById('status').innerText = `¡${winnerName} gana!`;
+                    gameActive = false;
+                    document.getElementById('change-mode').classList.remove('hidden');
+                    showToast(`${winnerName} ha ganado`);
+                    return;
+                }
+                if (data.status === 'draw') {
+                    document.getElementById('status').innerText = '¡Empate!';
+                    gameActive = false;
+                    document.getElementById('change-mode').classList.remove('hidden');
+                    showToast('Juego empatado');
+                    return;
+                }
+            } catch (error) {
+                console.error('Poll game state error:', error.message);
+                if (error.message.includes('Token inválido')) {
+                    logout();
+                    showToast('Sesión expirada. Por favor, inicia sesión nuevamente.');
+                    return;
+                }
+                showToast(`Error al actualizar el juego: ${error.message}`, true);
+            }
+            setTimeout(pollGameState, 2000);
+        }
+
+        function aiMove() {
+            console.log(`AI move, difficulty: ${aiDifficulty}`);
+            const emptyCells = gameBoard.map((cell, i) => cell === '' ? i : -1).filter(i => i !== -1);
+            if (emptyCells.length === 0) {
+                console.log('No empty cells for AI move');
+                return;
+            }
+
+            let moveIndex;
+            if (aiDifficulty === 'easy') {
+                moveIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                console.log(`Easy AI chose random move: ${moveIndex}`);
+            } else if (aiDifficulty === 'medium') {
+                if (Math.random() < 0.5) {
+                    moveIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+                    console.log(`Medium AI chose random move: ${moveIndex}`);
+                } else {
+                    moveIndex = minimax(gameBoard, 'O').index;
+                    console.log(`Medium AI chose minimax move: ${moveIndex}`);
+                }
+            } else {
+                moveIndex = minimax(gameBoard, 'O').index;
+                console.log(`Hard AI chose minimax move: ${moveIndex}`);
+            }
+
+            if (moveIndex === undefined || moveIndex < 0 || moveIndex > 8) {
+                console.error(`Invalid AI move index: ${moveIndex}`);
+                showToast('Error en el movimiento de la IA');
+                return;
+            }
+
+            gameBoard[moveIndex] = 'O';
+            renderBoard();
+            if (checkWin()) {
+                console.log('AI wins');
+                document.getElementById('status').innerText = `¡IA (O) gana!`;
+                gameActive = false;
+                document.getElementById('change-mode').classList.remove('hidden');
+                showToast('La IA ha ganado');
+                return;
+            }
+            if (checkDraw()) {
+                console.log('Game is a draw');
+                document.getElementById('status').innerText = '¡Empate!';
+                gameActive = false;
+                document.getElementById('change-mode').classList.remove('hidden');
+                showToast('Juego empatado');
+                return;
+            }
+            currentPlayer = 'X';
+            document.getElementById('status').innerText = `Tu turno (X)`;
+        }
+
+        function minimax(board, player) {
+            const emptyCells = board.map((cell, i) => cell === '' ? i : -1).filter(i => i !== -1);
+            if (checkWinPlayer(board, 'X')) return { score: -10 };
+            if (checkWinPlayer(board, 'O')) return { score: 10 };
+            if (emptyCells.length === 0) return { score: 0 };
+
+            const moves = [];
+            for (let i of emptyCells) {
+                let move = {};
+                move.index = i;
+                board[i] = player;
+                if (player === 'O') {
+                    move.score = minimax(board, 'X').score;
+                } else {
+                    move.score = minimax(board, 'O').score;
+                }
+                board[i] = '';
+                moves.push(move);
+            }
+
+            let bestMove = null;
+            if (player === 'O') {
+                let bestScore = -Infinity;
+                for (let move of moves) {
+                    if (move.score > bestScore) {
+                        bestScore = move.score;
+                        bestMove = move;
+                    }
+                }
+            } else {
+                let bestScore = Infinity;
+                for (let move of moves) {
+                    if (move.score < bestScore) {
+                        bestScore = move.score;
+                        bestMove = move;
+                    }
+                }
+            }
+            console.log(`Minimax for ${player}: chose move ${bestMove.index} with score ${bestMove.score}`);
+            return bestMove;
+        }
+
+        function checkWin() {
+            return checkWinPlayer(gameBoard, playerSymbol);
+        }
+
+        function checkWinPlayer(board, player) {
+            const winConditions = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
+            ];
+            return winConditions.some(condition =>
+                condition.every(index => board[index] === player)
+            );
+        }
+
+        function checkDraw() {
+            return gameBoard.every(cell => cell !== '');
+        }
+
+        function renderBoard() {
+            console.log('Rendering board:', gameBoard);
+            const cells = document.getElementsByClassName('cell');
+            for (let i = 0; i < cells.length; i++) {
+                cells[i].innerHTML = '';
+                if (gameBoard[i] === 'X') {
+                    cells[i].innerHTML = `<svg class="w-12 h-12 text-indigo-600 pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>`;
+                } else if (gameBoard[i] === 'O') {
+                    cells[i].innerHTML = `<svg class="w-12 h-12 text-red-600 pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>`;
+                }
+            }
+        }
+
+        function resetGame() {
+            console.log('Resetting game');
+            gameBoard = ['', '', '', '', '', '', '', '', ''];
+            currentPlayer = 'X';
+            gameActive = true;
+            renderBoard();
+            if (gameMode === 'ai') {
+                document.getElementById('status').innerText = `Tu turno (X) - Dificultad: ${aiDifficulty === 'easy' ? 'Fácil' : aiDifficulty === 'medium' ? 'Medio' : 'Difícil'}`;
+            } else if (gameMode === 'multiplayer') {
+                syncGameState().then(updateStatus);
+            } else {
+                playerSymbol = null;
+                opponentUsername = null;
+                document.getElementById('status').innerText = `Elige un modo de juego`;
+                document.getElementById('mode-selection').classList.remove('hidden');
+                document.getElementById('difficulty-selection').classList.add('hidden');
+                document.getElementById('invite-form').classList.add('hidden');
+                document.getElementById('invite-status').classList.add('hidden');
+                document.getElementById('send-invite-btn').disabled = false;
+                pendingInvitationId = null;
+            }
+        }
+
+        function changeMode() {
+            console.log('Changing mode');
+            gameMode = '';
+            gameId = '';
+            pendingInvitationId = null;
+            playerSymbol = null;
+            opponentUsername = null;
+            gameActive = false;
+            document.getElementById('change-mode').classList.add('hidden');
+            resetGame();
+            document.getElementById('status').innerText = 'Elige un modo de juego';
+            document.getElementById('mode-selection').classList.remove('hidden');
+        }
+
+        function showToast(message, debounce = false) {
+            const now = Date.now();
+            if (debounce && now - lastToastTime < TOAST_DEBOUNCE) return;
+            lastToastTime = now;
+            console.log('Toast:', message);
+            const toast = document.getElementById('toast');
+            toast.innerText = message;
+            toast.classList.remove('toast-hidden');
+            toast.classList.add('toast-visible');
+            setTimeout(() => {
+                toast.classList.remove('toast-visible');
+                toast.classList.add('toast-hidden');
+            }, 3000);
+        }
+
+        // Check for existing token
+        token = localStorage.getItem('token');
+        if (token) {
+            console.log('Found existing token, showing game screen');
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            document.getElementById('status').innerText = 'Elige un modo de juego';
+            pollInvitations();
+        }
+    </script>
+</body>
+</html>
