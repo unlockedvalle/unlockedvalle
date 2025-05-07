@@ -1,43 +1,4 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -60,17 +21,14 @@
                 var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
                 var firstSheetName = workbook.SheetNames[0];
                 var worksheet = workbook.Sheets[firstSheetName];
-
                 var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
                 var filteredData = jsonData.filter(row => row.some(filledCell));
-
                 var headerRowIndex = filteredData.findIndex((row, index) =>
                   row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
                 );
                 if (headerRowIndex === -1 || headerRowIndex > 25) {
                   headerRowIndex = 0;
                 }
-
                 var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
                 csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
                 return csv;
@@ -89,7 +47,6 @@
             box-sizing: border-box;
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', Roboto, sans-serif;
         }
-
         body {
             background-color: #0f172a;
             color: #e2e8f0;
@@ -97,7 +54,6 @@
             min-height: 100vh;
             overflow-x: hidden;
         }
-
         #particles-js {
             position: fixed;
             width: 100%;
@@ -106,7 +62,6 @@
             left: 0;
             z-index: -1;
         }
-
         .sidebar {
             width: 260px;
             background: linear-gradient(180deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
@@ -121,11 +76,9 @@
             transform: translateX(0);
             transition: transform 0.3s ease;
         }
-
         .sidebar.hidden {
             transform: translateX(-100%);
         }
-
         .sidebar-nav {
             background: transparent;
             border-radius: 0 20px 20px 0;
@@ -133,7 +86,6 @@
             margin: 20px 0;
             height: auto;
         }
-
         .sidebar-nav a {
             display: flex;
             align-items: center;
@@ -144,12 +96,10 @@
             font-weight: 500;
             transition: all 0.3s ease;
         }
-
         .sidebar-nav a:hover {
             background: rgba(255, 255, 255, 0.1);
             color: #7e22ce;
         }
-
         .sidebar-nav a svg {
             width: 22px;
             height: 22px;
@@ -157,21 +107,17 @@
             fill: #94a3b8;
             transition: fill 0.3s ease;
         }
-
         .sidebar-nav a:hover svg {
             fill: #7e22ce;
         }
-
         .main-content {
             flex: 1;
             margin-left: 260px;
             transition: margin-left 0.3s ease;
         }
-
         .main-content.full {
             margin-left: 0;
         }
-
         .navbar {
             width: calc(100% - 32px);
             margin: 16px 16px 0 16px;
@@ -187,7 +133,6 @@
             align-items: center;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         }
-
         .navbar .menu-toggle {
             background: none;
             border: none;
@@ -200,36 +145,28 @@
             top: 50%;
             transform: translateY(-50%);
         }
-
         .navbar .menu-toggle svg {
             width: 100%;
             height: 100%;
         }
-
         .menu-toggle .hamburger {
             display: block;
         }
-
         .menu-toggle .cross {
             display: none;
         }
-
         .menu-toggle.active .hamburger {
             display: none;
         }
-
         .menu-toggle.active .cross {
             display: block;
         }
-
         .navbar .menu-toggle:hover rect {
             fill: #7e22ce;
         }
-
         .menu-toggle rect {
             fill: #e2e8f0;
         }
-
         .navbar .logo {
             font-size: 24px;
             font-weight: 700;
@@ -239,20 +176,39 @@
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
+            cursor: pointer;
         }
-
+        .navbar .achievements-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            position: absolute;
+            right: 28px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .navbar .achievements-toggle svg {
+            width: 100%;
+            height: 100%;
+            fill: #e2e8f0;
+            transition: fill 0.3s ease;
+        }
+        .navbar .achievements-toggle:hover svg {
+            fill: #7e22ce;
+        }
         .container {
             max-width: 1280px;
             margin: 0 auto;
             padding: 32px;
         }
-
         .home-content {
             display: flex;
             flex-direction: column;
             gap: 32px;
         }
-
         .card {
             background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
             backdrop-filter: blur(10px);
@@ -263,29 +219,24 @@
             opacity: 0;
             transform: translateY(30px);
         }
-
         .card.visible {
             opacity: 1;
             transform: translateY(0);
         }
-
         .card:hover {
             transform: translateY(-5px);
         }
-
         .card h3 {
             font-size: 22px;
             font-weight: 600;
             margin-bottom: 14px;
             color: #e2e8f0;
         }
-
         .card p {
             font-size: 16px;
             line-height: 1.6;
             color: #d1d5db;
         }
-
         .cta-button {
             background: linear-gradient(135deg, #4f46e5, #7e22ce);
             color: #fff;
@@ -302,22 +253,19 @@
             width: 100%;
             text-align: center;
         }
-
         .cta-button:hover {
             background: linear-gradient(135deg, #3b82f6, #6b21a8);
             transform: scale(1.03);
         }
-
         .features-list {
             list-style: none;
-           engage: flex;
+            display: flex;
             flex-direction: column;
             gap: 14px;
             padding: 0;
             margin: 0;
             max-width: 100%;
         }
-
         .features-list li {
             display: flex;
             align-items: flex-start;
@@ -328,12 +276,10 @@
             word-break: break-word;
             overflow-wrap: break-word;
         }
-
         .features-list li strong {
             white-space: nowrap;
             color: #e2e8f0;
         }
-
         .features-list li::before {
             content: '';
             display: inline-block;
@@ -345,7 +291,6 @@
             margin-top: 6px;
             flex-shrink: 0;
         }
-
         .hero {
             background: linear-gradient(135deg, #4f46e5, #7e22ce);
             border-radius: 24px;
@@ -358,7 +303,6 @@
             position: relative;
             overflow: hidden;
         }
-
         .hero::before {
             content: '';
             position: absolute;
@@ -370,23 +314,19 @@
             opacity: 0.3;
             z-index: 0;
         }
-
         .hero-text {
             z-index: 1;
         }
-
         .hero-text h1 {
             font-size: 40px;
             font-weight: 700;
             margin-bottom: 14px;
         }
-
         .hero-text p {
             font-size: 18px;
             font-weight: 400;
             opacity: 0.9;
         }
-
         .hero img {
             width: 220px;
             height: auto;
@@ -394,7 +334,6 @@
             object-fit: contain;
             z-index: 1;
         }
-
         #passwordOverlay {
             position: fixed;
             top: 0;
@@ -409,11 +348,9 @@
             opacity: 0;
             animation: fadeIn 0.5s ease forwards;
         }
-
         @keyframes fadeIn {
             to { opacity: 1; }
         }
-
         .password-container {
             background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
             backdrop-filter: blur(10px);
@@ -426,18 +363,15 @@
             transform: scale(0.8);
             animation: popIn 0.4s ease forwards;
         }
-
         @keyframes popIn {
             to { transform: scale(1); }
         }
-
         .password-container h2 {
             font-size: 28px;
             font-weight: 700;
             margin-bottom: 20px;
             color: #e2e8f0;
         }
-
         .password-container input {
             width: 100%;
             padding: 14px;
@@ -449,12 +383,10 @@
             color: #e2e8f0;
             transition: border-color 0.3s ease;
         }
-
         .password-container input:focus {
             border-color: #7e22ce;
             outline: none;
         }
-
         .password-container button {
             background: linear-gradient(135deg, #4f46e5, #7e22ce);
             color: #fff;
@@ -467,77 +399,137 @@
             width: 100%;
             transition: all 0.3s ease;
         }
-
         .password-container button:hover {
             background: linear-gradient(135deg, #3b82f6, #6b21a8);
             transform: translateY(-2px);
         }
-
         .password-container p {
             color: #f87171;
             font-size: 14px;
             margin-top: 16px;
         }
-
+        #achievementsModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+        .achievements-container {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            text-align: center;
+            color: #e2e8f0;
+        }
+        .achievements-container h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        .achievement-item {
+            display: flex;
+            align-items: center;
+            padding: 14px;
+            margin-bottom: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            text-align: left;
+        }
+        .achievement-item.locked {
+            opacity: 0.5;
+        }
+        .achievement-item svg {
+            width: 30px;
+            height: 30px;
+            margin-right: 14px;
+            fill: #7e22ce;
+        }
+        .achievement-item h4 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .achievement-item p {
+            font-size: 14px;
+            color: #d1d5db;
+        }
+        .secret-area {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            opacity: 0;
+        }
+        .secret-area:hover {
+            opacity: 0.2;
+            background: rgba(255, 255, 255, 0.2);
+        }
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
             }
-
             .sidebar.visible {
                 transform: translateX(0);
-           
-
+            }
             .main-content {
                 margin-left: 0;
             }
-
             .navbar {
                 margin: 12px 12px 0 12px;
                 padding: 16px 20px;
                 min-height: 60px;
             }
-
             .navbar .menu-toggle {
                 left: 20px;
             }
-
             .navbar .logo {
                 font-size: 22px;
             }
-
+            .navbar .achievements-toggle {
+                right: 20px;
+            }
             .home-content {
                 padding: 0 20px;
             }
-
             .card {
                 padding: 20px;
             }
-
             .hero {
                 flex-direction: column;
                 text-align: center;
                 padding: 32px;
             }
-
             .hero img {
                 margin-top: 24px;
                 width: 160px;
             }
-
             .hero-text h1 {
                 font-size: 32px;
             }
-
             .hero-text p {
                 font-size: 16px;
             }
-
             .features-list li {
                 font-size: 15px;
             }
-
             .password-container {
+                padding: 24px;
+                max-width: 90%;
+            }
+            .achievements-container {
                 padding: 24px;
                 max-width: 90%;
             }
@@ -554,7 +546,13 @@
             <p id="errorMessage" style="display: none;">Contraseña incorrecta. Intenta de nuevo.</p>
         </div>
     </div>
-
+    <div id="achievementsModal">
+        <div class="achievements-container">
+            <h2>Tus Logros</h2>
+            <div id="achievementsList"></div>
+            <button class="cta-button" onclick="closeAchievements()">Cerrar</button>
+        </div>
+    </div>
     <aside class="sidebar" id="sidebar">
         <nav class="sidebar-nav">
             <a href="index.html">
@@ -589,7 +587,6 @@
             </a>
         </nav>
     </aside>
-
     <div class="main-content" id="mainContent">
         <nav class="navbar">
             <button class="menu-toggle" id="menuToggle">
@@ -603,17 +600,22 @@
                     <rect x="3" y="11" width="18" height="2" rx="1" transform="rotate(-45 12 12)"/>
                 </svg>
             </button>
-            <div class="logo">Unlocked VALLE Reloaded</div>
+            <div class="logo" id="siteLogo">Unlocked VALLE Reloaded</div>
+            <button class="achievements-toggle" onclick="showAchievements()">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                </svg>
+            </button>
         </nav>
-
         <div class="container">
             <div class="home-content">
-                <div class="hero">
+                <div class="hero" id="heroSection">
                     <div class="hero-text">
                         <h1>Descubre Unlocked VALLE Reloaded</h1>
                         <p>Juega en clase y conéctate sin límites con nuestra plataforma renovada para estudiantes.</p>
                     </div>
                     <img src="https://i.ibb.co/cXtm9Qd3/UNLOCKED-VALLE-1.png" alt="Unlocked Valle Reloaded Logo">
+                    <div class="secret-area" id="secretArea"></div>
                 </div>
                 <div class="card">
                     <h3>¡Volvimos Más Fuertes!</h3>
@@ -631,11 +633,11 @@
                 <div class="card">
                     <h3>¿Por Qué Elegir Unlocked VALLE Reloaded?</h3>
                     <ul class="features-list">
-                        <li><strong>Juegos para Clase: </strong>‎  Explora enlaces a juegos de todo tipo en la sección de Enlaces.</li>
-                        <li><strong>Conexión Sin Límites: </strong>‎  Usa UV Messages y UV Call para chatear y hablar con amigos en cualquier momento.</li>
-                        <li><strong>Diseño Moderno: </strong>‎  Navega con una interfaz elegante y optimizada para estudiantes.</li>
-                        <li><strong>Privacidad Garantizada: </strong>‎  Disfruta con confianza gracias a nuestras medidas de seguridad avanzadas.</li>
-                        <li><strong>Compatibilidad Total: </strong>‎  Usa la plataforma en laptops, tablets o móviles sin problemas.</li>
+                        <li><strong>Juegos para Clase: </strong> Explora enlaces a juegos de todo tipo en la sección de Enlaces.</li>
+                        <li><strong>Conexión Sin Límites: </strong> Usa UV Messages y UV Call para chatear y hablar con amigos en cualquier momento.</li>
+                        <li><strong>Diseño Moderno: </strong> Navega con una interfaz elegante y optimizada para estudiantes.</li>
+                        <li><strong>Privacidad Garantizada: </strong> Disfruta con confianza gracias a nuestras medidas de seguridad avanzadas.</li>
+                        <li><strong>Compatibilidad Total: </strong> Usa la plataforma en laptops, tablets o móviles sin problemas.</li>
                     </ul>
                 </div>
                 <div class="card">
@@ -654,11 +656,13 @@
             </div>
         </div>
     </div>
-
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             checkAuth();
             initParticles();
+            initAchievements();
+            initSecrets();
+            initAchievementTriggers();
         });
 
         function initParticles() {
@@ -681,12 +685,167 @@
             });
         }
 
+        const achievements = [
+            { id: 'first-login', name: 'Primer Paso', description: 'Iniciaste sesión en Unlocked VALLE Reloaded.', unlocked: false },
+            { id: 'logo-master', name: 'Maestro del Logo', description: 'Clicaste el logo 5 veces.', unlocked: false },
+            { id: 'code-breaker', name: 'Rompe Códigos', description: 'Encontraste el código secreto.', unlocked: false },
+            { id: 'secret-explorer', name: 'Explorador Secreto', description: 'Descubriste un área oculta en el héroe.', unlocked: false },
+            { id: 'keyboard-ninja', name: 'Ninja del Teclado', description: 'Usaste la combinación secreta de teclas.', unlocked: false },
+            { id: 'night-owl', name: 'Búho Nocturno', description: 'Visitaste el sitio después de las 10 PM.', unlocked: false },
+            { id: 'menu-explorer', name: 'Explorador de Menú', description: 'Hiciste clic en todas las opciones del menú.', unlocked: false },
+            { id: 'rapid-clicker', name: 'Clic Rápido', description: 'Clicaste el logo 3 veces en menos de 2 segundos.', unlocked: false },
+            { id: 'trophy-hunter', name: 'Cazador de Trofeos', description: 'Abriste el panel de logros 5 veces.', unlocked: false },
+            { id: 'hero-inspector', name: 'Inspector del Héroe', description: 'Clicaste la imagen del héroe 3 veces.', unlocked: false },
+            { id: 'persistent-visitor', name: 'Visitante Persistente', description: 'Visitaste el sitio 5 veces.', unlocked: false }
+        ];
+
+        function initAchievements() {
+            let storedAchievements = JSON.parse(localStorage.getItem('achievements')) || {};
+            achievements.forEach(ach => {
+                if (storedAchievements[ach.id]) {
+                    ach.unlocked = true;
+                }
+            });
+            const currentHour = new Date().getHours();
+            if (currentHour >= 22) {
+                unlockAchievement('night-owl');
+            }
+            let visitCount = parseInt(localStorage.getItem('visitCount')) || 0;
+            visitCount++;
+            localStorage.setItem('visitCount', visitCount);
+            if (visitCount >= 5) {
+                unlockAchievement('persistent-visitor');
+            }
+        }
+
+        function unlockAchievement(id) {
+            const achievement = achievements.find(ach => ach.id === id);
+            if (achievement && !achievement.unlocked) {
+                achievement.unlocked = true;
+                let storedAchievements = JSON.parse(localStorage.getItem('achievements')) || {};
+                storedAchievements[id] = true;
+                localStorage.setItem('achievements', JSON.stringify(storedAchievements));
+                showAchievementNotification(achievement.name);
+            }
+        }
+
+        function showAchievementNotification(name) {
+            const notification = document.createElement('div');
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.right = '20px';
+            notification.style.background = 'linear-gradient(135deg, #4f46e5, #7e22ce)';
+            notification.style.color = '#fff';
+            notification.style.padding = '16px';
+            notification.style.borderRadius = '10px';
+            notification.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.2)';
+            notification.style.zIndex = '10001';
+            notification.innerText = `¡Logro Desbloqueado: ${name}!`;
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => notification.remove(), 500);
+            }, 3000);
+        }
+
+        function showAchievements() {
+            const modal = document.getElementById('achievementsModal');
+            const list = document.getElementById('achievementsList');
+            list.innerHTML = '';
+            achievements.forEach(ach => {
+                const item = document.createElement('div');
+                item.className = `achievement-item ${ach.unlocked ? '' : 'locked'}`;
+                item.innerHTML = `
+                    <svg viewBox="0 0 24 24">
+                        ${ach.unlocked ?
+                            '<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>' :
+                            '<path d="M19 5.83L17.17 4 12 9.17 6.83 4 5 5.83 10.17 11 5 16.17 6.83 18 12 12.83 17.17 18 19 16.17 13.83 11 19 5.83z"/>'
+                        }
+                    </svg>
+                    <div>
+                        <h4>${ach.name}</h4>
+                        <p>${ach.unlocked ? ach.description : '???'}</p>
+                    </div>
+                `;
+                list.appendChild(item);
+            });
+            modal.style.display = 'flex';
+            let trophyCount = parseInt(localStorage.getItem('trophyCount')) || 0;
+            trophyCount++;
+            localStorage.setItem('trophyCount', trophyCount);
+            if (trophyCount >= 5) {
+                unlockAchievement('trophy-hunter');
+            }
+        }
+
+        function closeAchievements() {
+            document.getElementById('achievementsModal').style.display = 'none';
+        }
+
+        function initSecrets() {
+            let logoClickCount = 0;
+            let lastClickTime = 0;
+            let rapidClickCount = 0;
+            document.getElementById('siteLogo').addEventListener('click', () => {
+                logoClickCount++;
+                const currentTime = Date.now();
+                if (currentTime - lastClickTime < 2000) {
+                    rapidClickCount++;
+                    if (rapidClickCount >= 3) {
+                        unlockAchievement('rapid-clicker');
+                    }
+                } else {
+                    rapidClickCount = 1;
+                }
+                lastClickTime = currentTime;
+                if (logoClickCount >= 5) {
+                    unlockAchievement('logo-master');
+                    alert('¡Secreto encontrado! Eres un maestro del logo.');
+                }
+            });
+            document.getElementById('secretArea').addEventListener('click', () => {
+                unlockAchievement('secret-explorer');
+                alert('¡Área secreta descubierta! Eres un verdadero explorador.');
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'v') {
+                    unlockAchievement('keyboard-ninja');
+                    alert('¡Combinación secreta activada! Eres un ninja del teclado.');
+                }
+            });
+            document.querySelector('.hero img').addEventListener('click', () => {
+                let heroClickCount = parseInt(localStorage.getItem('heroClickCount')) || 0;
+                heroClickCount++;
+                localStorage.setItem('heroClickCount', heroClickCount);
+                if (heroClickCount >= 3) {
+                    unlockAchievement('hero-inspector');
+                }
+            });
+        }
+
+        function initAchievementTriggers() {
+            const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    let clickedLinks = JSON.parse(localStorage.getItem('clickedLinks')) || [];
+                    const href = link.getAttribute('href');
+                    if (!clickedLinks.includes(href)) {
+                        clickedLinks.push(href);
+                        localStorage.setItem('clickedLinks', JSON.stringify(clickedLinks));
+                        if (clickedLinks.length >= sidebarLinks.length) {
+                            unlockAchievement('menu-explorer');
+                        }
+                    }
+                });
+            });
+        }
+
         function checkAuth() {
             const isAuthenticated = sessionStorage.getItem('isAuthenticated') === 'true';
             const passwordOverlay = document.getElementById('passwordOverlay');
             const mainContent = document.getElementById('mainContent');
             const sidebar = document.getElementById('sidebar');
-
             if (isAuthenticated) {
                 passwordOverlay.style.display = 'none';
                 mainContent.style.display = 'block';
@@ -706,7 +865,6 @@
             const passwordOverlay = document.getElementById('passwordOverlay');
             const mainContent = document.getElementById('mainContent');
             const sidebar = document.getElementById('sidebar');
-
             if (passwordInput === 'uvdevuelta') {
                 sessionStorage.setItem('isAuthenticated', 'true');
                 passwordOverlay.style.display = 'none';
@@ -714,6 +872,11 @@
                 sidebar.style.display = 'block';
                 initSidebar();
                 animateCards();
+                unlockAchievement('first-login');
+            } else if (passwordInput === 'easteregg') {
+                unlockAchievement('code-breaker');
+                alert('¡Código secreto encontrado! Eres un rompe códigos.');
+                document.getElementById('passwordInput').value = '';
             } else {
                 errorMessage.style.display = 'block';
                 document.getElementById('passwordInput').value = '';
@@ -734,7 +897,6 @@
             const sidebar = document.getElementById('sidebar');
             const mainContent = document.getElementById('mainContent');
             const menuToggle = document.getElementById('menuToggle');
-
             if (isSidebarHidden) {
                 sidebar.classList.add('hidden');
                 mainContent.classList.add('full');
@@ -744,7 +906,6 @@
                 mainContent.classList.remove('full');
                 menuToggle.classList.add('active');
             }
-
             menuToggle.addEventListener('click', toggleSidebar);
         }
 
@@ -753,11 +914,9 @@
             const mainContent = document.getElementById('mainContent');
             const menuToggle = document.getElementById('menuToggle');
             const isHidden = sidebar.classList.toggle('hidden');
-
             mainContent.classList.toggle('full', isHidden);
             menuToggle.classList.toggle('active', !isHidden);
             localStorage.setItem('sidebarHidden', isHidden);
-
             if (window.innerWidth <= 768) {
                 sidebar.classList.toggle('visible', !isHidden);
             }
