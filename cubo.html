@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resuelve tu Cubo de Rubik</title>
+    <title>Resuelve tu Pyraminx</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -21,23 +21,86 @@
             justify-content: center;
             gap: 20px;
         }
-        .cube-input, .instructions {
+        .pyraminx-input, .instructions {
             background: white;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
         .face {
-            display: grid;
-            grid-template-columns: repeat(3, 40px);
-            gap: 2px;
-            margin: 10px auto;
+            display: inline-block;
+            position: relative;
+            width: 120px;
+            height: 104px; /* Aproximado para triángulo equilátero */
+            margin: 10px;
         }
         .sticker {
-            width: 40px;
-            height: 40px;
-            border: 1px solid #333;
+            position: absolute;
             cursor: pointer;
+        }
+        .center { /* Centro */
+            width: 20px;
+            height: 20px;
+            background: #ccc;
+            left: 50px;
+            top: 44px;
+            transform: translate(-50%, -50%);
+        }
+        .edge1 { /* Borde superior */
+            width: 20px;
+            height: 20px;
+            left: 50px;
+            top: 20px;
+            transform: translate(-50%, -50%);
+        }
+        .edge2 { /* Borde inferior izquierda */
+            width: 20px;
+            height: 20px;
+            left: 30px;
+            top: 64px;
+            transform: translate(-50%, -50%);
+        }
+        .edge3 { /* Borde inferior derecha */
+            width: 20px;
+            height: 20px;
+            left: 70px;
+            top: 64px;
+            transform: translate(-50%, -50%);
+        }
+        .edge4 { /* Borde superior (segundo) */
+            width: 20px;
+            height: 20px;
+            left: 50px;
+            top: 10px;
+            transform: translate(-50%, -50%);
+        }
+        .corner1 { /* Esquina superior */
+            width: 20px;
+            height: 20px;
+            left: 50px;
+            top: 0px;
+            transform: translate(-50%, -50%);
+        }
+        .corner2 { /* Esquina inferior izquierda */
+            width: 20px;
+            height: 20px;
+            left: 20px;
+            top: 84px;
+            transform: translate(-50%, -50%);
+        }
+        .corner3 { /* Esquina inferior derecha */
+            width: 20px;
+            height: 20px;
+            left: 80px;
+            top: 84px;
+            transform: translate(-50%, -50%);
+        }
+        .corner4 { /* Esquina superior (segunda) */
+            width: 20px;
+            height: 20px;
+            left: 60px;
+            top: 20px;
+            transform: translate(-50%, -50%);
         }
         .color-picker {
             margin: 10px 0;
@@ -58,76 +121,87 @@
         button:hover:not(:disabled) {
             background-color: #0056b3;
         }
-        #current-step {
-            font-size: 18px;
-            margin: 10px 0;
-        }
         select {
             padding: 5px;
             margin: 5px;
         }
+        .color-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #333;
+        }
+        .selected-color {
+            border: 3px solid #000;
+        }
+        .animating {
+            animation: rotate 1s ease-in-out;
+        }
+        @keyframes rotate {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(120deg); }
+        }
+        #current-step {
+            font-size: 18px;
+            margin: 10px 0;
+        }
     </style>
 </head>
 <body>
-    <h1>Resuelve tu Cubo de Rubik</h1>
+    <h1>Resuelve tu Pyraminx</h1>
     <div class="container">
-        <!-- Sección para pintar el cubo -->
-        <div class="cube-input">
-            <h2>Pinta tu Cubo</h2>
+        <!-- Sección para pintar el Pyraminx -->
+        <div class="pyraminx-input">
+            <h2>Pinta tu Pyraminx</h2>
             <label>Selecciona la cara:</label>
             <select id="face-selector">
-                <option value="U">Arriba (Blanco)</option>
                 <option value="F">Frente (Verde)</option>
                 <option value="R">Derecha (Rojo)</option>
-                <option value="L">Izquierda (Naranja)</option>
-                <option value="B">Atrás (Azul)</option>
+                <option value="L">Izquierda (Azul)</option>
                 <option value="D">Abajo (Amarillo)</option>
             </select>
             <div class="color-picker">
                 <label>Selecciona color:</label>
-                <button class="color-btn" style="background-color: #ffffff;" data-color="W"></button>
                 <button class="color-btn" style="background-color: #00ff00;" data-color="G"></button>
                 <button class="color-btn" style="background-color: #ff0000;" data-color="R"></button>
-                <button class="color-btn" style="background-color: #ffa500;" data-color="O"></button>
                 <button class="color-btn" style="background-color: #0000ff;" data-color="B"></button>
                 <button class="color-btn" style="background-color: #ffff00;" data-color="Y"></button>
             </div>
-            <div id="cube-face" class="face"></div>
-            <button id="solve-btn" disabled>Resolver Cubo</button>
+            <div id="pyraminx-face" class="face"></div>
+            <button id="solve-btn" disabled>Resolver Pyraminx</button>
         </div>
         <!-- Sección de instrucciones -->
         <div class="instructions">
             <h2>Instrucciones</h2>
-            <p id="current-step">Pinta todas las caras del cubo primero.</p>
+            <p id="current-step">Pinta todas las caras del Pyraminx primero.</p>
+            <div id="animation-face" class="face"></div>
             <button id="next-step" disabled>Siguiente Paso</button>
             <button id="prev-step" disabled>Paso Anterior</button>
         </div>
     </div>
     <script>
-        // Estado inicial del cubo
-        let cubeState = {
-            U: Array(9).fill('W'), // Arriba (blanco)
-            F: Array(9).fill('G'), // Frente (verde)
-            R: Array(9).fill('R'), // Derecha (rojo)
-            L: Array(9).fill('O'), // Izquierda (naranja)
-            B: Array(9).fill('B'), // Atrás (azul)
-            D: Array(9).fill('Y')  // Abajo (amarillo)
+        // Estado inicial del Pyraminx (4 caras, 9 stickers por cara: 1 centro, 4 bordes, 4 esquinas)
+        let pyraminxState = {
+            F: ['G', 'G', 'G', 'G', 'G', 'G', 'G', 'G', 'G'], // Frente (verde)
+            R: ['R', 'R', 'R', 'R', 'R', 'R', 'R', 'R', 'R'], // Derecha (rojo)
+            L: ['B', 'B', 'B', 'B', 'B', 'B', 'B', 'B', 'B'], // Izquierda (azul)
+            D: ['Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y', 'Y']  // Abajo (amarillo)
         };
-        let selectedFace = 'U';
-        let selectedColor = 'W';
+        let selectedFace = 'F';
+        let selectedColor = 'G';
         let solutionSteps = [];
         let currentStepIndex = 0;
 
         // Elementos del DOM
         const faceSelector = document.getElementById('face-selector');
-        const cubeFaceDiv = document.getElementById('cube-face');
+        const pyraminxFaceDiv = document.getElementById('pyraminx-face');
+        const animationFaceDiv = document.getElementById('animation-face');
         const colorButtons = document.querySelectorAll('.color-btn');
         const solveBtn = document.getElementById('solve-btn');
         const currentStepP = document.getElementById('current-step');
         const nextStepBtn = document.getElementById('next-step');
         const prevStepBtn = document.getElementById('prev-step');
 
-        // Inicializar la cara seleccionada
+        // Inicializar cara
         renderFace();
 
         // Cambiar de cara
@@ -141,34 +215,35 @@
         colorButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 selectedColor = btn.dataset.color;
-                colorButtons.forEach(b => b.style.border = '1px solid #333');
-                btn.style.border = '3px solid #000';
+                colorButtons.forEach(b => b.classList.remove('selected-color'));
+                btn.classList.add('selected-color');
             });
+            // Seleccionar el primer color por defecto
+            if (btn.dataset.color === 'G') btn.classList.add('selected-color');
         });
 
         // Renderizar cara actual
         function renderFace() {
-            cubeFaceDiv.innerHTML = '';
-            cubeState[selectedFace].forEach((color, index) => {
+            pyraminxFaceDiv.innerHTML = '';
+            const classes = ['center', 'edge1', 'edge2', 'edge3', 'edge4', 'corner1', 'corner2', 'corner3', 'corner4'];
+            pyraminxState[selectedFace].forEach((color, index) => {
                 const sticker = document.createElement('div');
-                sticker.className = 'sticker';
+                sticker.className = `sticker ${classes[index]}`;
                 sticker.style.backgroundColor = getColorHex(color);
                 sticker.addEventListener('click', () => {
-                    cubeState[selectedFace][index] = selectedColor;
+                    pyraminxState[selectedFace][index] = selectedColor;
                     sticker.style.backgroundColor = getColorHex(selectedColor);
                     checkAllFacesFilled();
                 });
-                cubeFaceDiv.appendChild(sticker);
+                pyraminxFaceDiv.appendChild(sticker);
             });
         }
 
         // Convertir color a hexadecimal
         function getColorHex(color) {
             const colors = {
-                W: '#ffffff', // Blanco
                 G: '#00ff00', // Verde
                 R: '#ff0000', // Rojo
-                O: '#ffa500', // Naranja
                 B: '#0000ff', // Azul
                 Y: '#ffff00'  // Amarillo
             };
@@ -177,17 +252,21 @@
 
         // Verificar si todas las caras están completas
         function checkAllFacesFilled() {
-            const allFilled = Object.values(cubeState).every(face => 
-                face.every(color => ['W', 'G', 'R', 'O', 'B', 'Y'].includes(color))
+            const allFilled = Object.values(pyraminxState).every(face => 
+                face.every(color => ['G', 'R', 'B', 'Y'].includes(color))
             );
             solveBtn.disabled = !allFilled;
         }
 
-        // Resolver cubo (simulación)
+        // Resolver Pyraminx (simulación)
         solveBtn.addEventListener('click', () => {
-            // Aquí se integraría Kociemba.js o similar
-            // Por ahora, simulamos una solución
-            solutionSteps = ["R", "U", "R'", "U'", "F", "F", "U", "L", "U'", "L'"];
+            // Simulación de pasos (en un caso real, usar algoritmo LBL)
+            solutionSteps = [
+                { face: 'F', type: 'tip', direction: 'clockwise', description: 'Gira la punta frontal en sentido horario' },
+                { face: 'R', type: 'face', direction: 'clockwise', description: 'Gira la cara derecha en sentido horario' },
+                { face: 'L', type: 'tip', direction: 'counterclockwise', description: 'Gira la punta izquierda en sentido antihorario' },
+                { face: 'D', type: 'face', direction: 'clockwise', description: 'Gira la cara inferior en sentido horario' }
+            ];
             currentStepIndex = 0;
             showStep();
             solveBtn.disabled = true;
@@ -195,16 +274,53 @@
             prevStepBtn.disabled = true;
         });
 
-        // Mostrar paso actual
+        // Mostrar paso actual con animación
         function showStep() {
             if (currentStepIndex < solutionSteps.length) {
-                currentStepP.textContent = `Paso ${currentStepIndex + 1}: Gira ${solutionSteps[currentStepIndex]}`;
+                const step = solutionSteps[currentStepIndex];
+                currentStepP.textContent = `Paso ${currentStepIndex + 1}: ${step.description}`;
+                animateStep(step);
                 nextStepBtn.disabled = currentStepIndex === solutionSteps.length - 1;
                 prevStepBtn.disabled = currentStepIndex === 0;
             } else {
-                currentStepP.textContent = '¡Cubo resuelto!';
+                currentStepP.textContent = '¡Pyraminx resuelto!';
+                animationFaceDiv.innerHTML = '';
                 nextStepBtn.disabled = true;
             }
+        }
+
+        // Animar paso
+        function animateStep(step) {
+            animationFaceDiv.innerHTML = '';
+            const classes = ['center', 'edge1', 'edge2', 'edge3', 'edge4', 'corner1', 'corner2', 'corner3', 'corner4'];
+            const faceState = [...pyraminxState[step.face]]; // Copia del estado actual
+            // Simular giro (en un caso real, actualizar estado según algoritmo)
+            if (step.type === 'tip') {
+                // Girar solo la esquina (índices 5, 6, 7, 8)
+                if (step.direction === 'clockwise') {
+                    [faceState[5], faceState[6], faceState[7]] = [faceState[7], faceState[5], faceState[6]];
+                } else {
+                    [faceState[5], faceState[6], faceState[7]] = [faceState[6], faceState[7], faceState[5]];
+                }
+            } else {
+                // Girar toda la cara
+                if (step.direction === 'clockwise') {
+                    [faceState[1], faceState[2], faceState[3], faceState[5], faceState[6], faceState[7]] = 
+                    [faceState[3], faceState[1], faceState[2], faceState[7], faceState[5], faceState[6]];
+                } else {
+                    [faceState[1], faceState[2], faceState[3], faceState[5], faceState[6], faceState[7]] = 
+                    [faceState[2], faceState[3], faceState[1], faceState[6], faceState[7], faceState[5]];
+                }
+            }
+            // Mostrar cara animada
+            faceState.forEach((color, index) => {
+                const sticker = document.createElement('div');
+                sticker.className = `sticker ${classes[index]} ${step.type === 'tip' && index < 5 ? '' : 'animating'}`;
+                sticker.style.backgroundColor = getColorHex(color);
+                animationFaceDiv.appendChild(sticker);
+            });
+            // Actualizar estado (simulado, solo para la cara mostrada)
+            pyraminxState[step.face] = faceState;
         }
 
         // Navegar entre pasos
