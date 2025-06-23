@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resuelve tu Cubo de Rubik</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Resuelve tu Cubo de Rubik</h1>
+    <div class="container">
+        <!-- Sección para capturar caras -->
+        <div class="scan-section">
+            <h2>Escanea las caras</h2>
+            <video id="video" width="320" height="240" autoplay></video>
+            <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
+            <button id="capture">Capturar Cara</button>
+            <p>Cara actual: <span id="current-face">Frente (F)</span></p>
+            <div id="cube-input">
+                <p>Ingresa manualmente (opcional):</p>
+                <input type="text" id="face-input" placeholder="Ej: RRRWWWBBB">
+                <button id="submit-face">Enviar Cara</button>
+            </div>
+        </div>
+
+        <!-- Visualización del cubo -->
+        <div class="cube-view">
+            <h2>Estado del Cubo</h2>
+            <div id="cube-2d"></div>
+        </div>
+
+        <!-- Instrucciones paso a paso -->
+        <div class="instructions">
+            <h2>Instrucciones</h2>
+            <p id="current-step">Paso actual: Escanea todas las caras primero.</p>
+            <button id="next-step" disabled>Siguiente Paso</button>
+            <button id="prev-step" disabled>Paso Anterior</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
