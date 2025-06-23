@@ -4,39 +4,223 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resuelve tu Cubo de Rubik</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+        .cube-input, .instructions {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .face {
+            display: grid;
+            grid-template-columns: repeat(3, 40px);
+            gap: 2px;
+            margin: 10px auto;
+        }
+        .sticker {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #333;
+            cursor: pointer;
+        }
+        .color-picker {
+            margin: 10px 0;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        button:hover:not(:disabled) {
+            background-color: #0056b3;
+        }
+        #current-step {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+        select {
+            padding: 5px;
+            margin: 5px;
+        }
+    </style>
 </head>
 <body>
     <h1>Resuelve tu Cubo de Rubik</h1>
     <div class="container">
-        <!-- Sección para capturar caras -->
-        <div class="scan-section">
-            <h2>Escanea las caras</h2>
-            <video id="video" width="320" height="240" autoplay></video>
-            <canvas id="canvas" width="320" height="240" style="display:none;"></canvas>
-            <button id="capture">Capturar Cara</button>
-            <p>Cara actual: <span id="current-face">Frente (F)</span></p>
-            <div id="cube-input">
-                <p>Ingresa manualmente (opcional):</p>
-                <input type="text" id="face-input" placeholder="Ej: RRRWWWBBB">
-                <button id="submit-face">Enviar Cara</button>
+        <!-- Sección para pintar el cubo -->
+        <div class="cube-input">
+            <h2>Pinta tu Cubo</h2>
+            <label>Selecciona la cara:</label>
+            <select id="face-selector">
+                <option value="U">Arriba (Blanco)</option>
+                <option value="F">Frente (Verde)</option>
+                <option value="R">Derecha (Rojo)</option>
+                <option value="L">Izquierda (Naranja)</option>
+                <option value="B">Atrás (Azul)</option>
+                <option value="D">Abajo (Amarillo)</option>
+            </select>
+            <div class="color-picker">
+                <label>Selecciona color:</label>
+                <button class="color-btn" style="background-color: #ffffff;" data-color="W"></button>
+                <button class="color-btn" style="background-color: #00ff00;" data-color="G"></button>
+                <button class="color-btn" style="background-color: #ff0000;" data-color="R"></button>
+                <button class="color-btn" style="background-color: #ffa500;" data-color="O"></button>
+                <button class="color-btn" style="background-color: #0000ff;" data-color="B"></button>
+                <button class="color-btn" style="background-color: #ffff00;" data-color="Y"></button>
             </div>
+            <div id="cube-face" class="face"></div>
+            <button id="solve-btn" disabled>Resolver Cubo</button>
         </div>
-
-        <!-- Visualización del cubo -->
-        <div class="cube-view">
-            <h2>Estado del Cubo</h2>
-            <div id="cube-2d"></div>
-        </div>
-
-        <!-- Instrucciones paso a paso -->
+        <!-- Sección de instrucciones -->
         <div class="instructions">
             <h2>Instrucciones</h2>
-            <p id="current-step">Paso actual: Escanea todas las caras primero.</p>
+            <p id="current-step">Pinta todas las caras del cubo primero.</p>
             <button id="next-step" disabled>Siguiente Paso</button>
             <button id="prev-step" disabled>Paso Anterior</button>
         </div>
     </div>
-    <script src="script.js"></script>
+    <script>
+        // Estado inicial del cubo
+        let cubeState = {
+            U: Array(9).fill('W'), // Arriba (blanco)
+            F: Array(9).fill('G'), // Frente (verde)
+            R: Array(9).fill('R'), // Derecha (rojo)
+            L: Array(9).fill('O'), // Izquierda (naranja)
+            B: Array(9).fill('B'), // Atrás (azul)
+            D: Array(9).fill('Y')  // Abajo (amarillo)
+        };
+        let selectedFace = 'U';
+        let selectedColor = 'W';
+        let solutionSteps = [];
+        let currentStepIndex = 0;
+
+        // Elementos del DOM
+        const faceSelector = document.getElementById('face-selector');
+        const cubeFaceDiv = document.getElementById('cube-face');
+        const colorButtons = document.querySelectorAll('.color-btn');
+        const solveBtn = document.getElementById('solve-btn');
+        const currentStepP = document.getElementById('current-step');
+        const nextStepBtn = document.getElementById('next-step');
+        const prevStepBtn = document.getElementById('prev-step');
+
+        // Inicializar la cara seleccionada
+        renderFace();
+
+        // Cambiar de cara
+        faceSelector.addEventListener('change', () => {
+            selectedFace = faceSelector.value;
+            renderFace();
+            checkAllFacesFilled();
+        });
+
+        // Seleccionar color
+        colorButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                selectedColor = btn.dataset.color;
+                colorButtons.forEach(b => b.style.border = '1px solid #333');
+                btn.style.border = '3px solid #000';
+            });
+        });
+
+        // Renderizar cara actual
+        function renderFace() {
+            cubeFaceDiv.innerHTML = '';
+            cubeState[selectedFace].forEach((color, index) => {
+                const sticker = document.createElement('div');
+                sticker.className = 'sticker';
+                sticker.style.backgroundColor = getColorHex(color);
+                sticker.addEventListener('click', () => {
+                    cubeState[selectedFace][index] = selectedColor;
+                    sticker.style.backgroundColor = getColorHex(selectedColor);
+                    checkAllFacesFilled();
+                });
+                cubeFaceDiv.appendChild(sticker);
+            });
+        }
+
+        // Convertir color a hexadecimal
+        function getColorHex(color) {
+            const colors = {
+                W: '#ffffff', // Blanco
+                G: '#00ff00', // Verde
+                R: '#ff0000', // Rojo
+                O: '#ffa500', // Naranja
+                B: '#0000ff', // Azul
+                Y: '#ffff00'  // Amarillo
+            };
+            return colors[color];
+        }
+
+        // Verificar si todas las caras están completas
+        function checkAllFacesFilled() {
+            const allFilled = Object.values(cubeState).every(face => 
+                face.every(color => ['W', 'G', 'R', 'O', 'B', 'Y'].includes(color))
+            );
+            solveBtn.disabled = !allFilled;
+        }
+
+        // Resolver cubo (simulación)
+        solveBtn.addEventListener('click', () => {
+            // Aquí se integraría Kociemba.js o similar
+            // Por ahora, simulamos una solución
+            solutionSteps = ["R", "U", "R'", "U'", "F", "F", "U", "L", "U'", "L'"];
+            currentStepIndex = 0;
+            showStep();
+            solveBtn.disabled = true;
+            nextStepBtn.disabled = false;
+            prevStepBtn.disabled = true;
+        });
+
+        // Mostrar paso actual
+        function showStep() {
+            if (currentStepIndex < solutionSteps.length) {
+                currentStepP.textContent = `Paso ${currentStepIndex + 1}: Gira ${solutionSteps[currentStepIndex]}`;
+                nextStepBtn.disabled = currentStepIndex === solutionSteps.length - 1;
+                prevStepBtn.disabled = currentStepIndex === 0;
+            } else {
+                currentStepP.textContent = '¡Cubo resuelto!';
+                nextStepBtn.disabled = true;
+            }
+        }
+
+        // Navegar entre pasos
+        nextStepBtn.addEventListener('click', () => {
+            if (currentStepIndex < solutionSteps.length) {
+                currentStepIndex++;
+                showStep();
+            }
+        });
+
+        prevStepBtn.addEventListener('click', () => {
+            if (currentStepIndex > 0) {
+                currentStepIndex--;
+                showStep();
+            }
+        });
+    </script>
 </body>
 </html>
